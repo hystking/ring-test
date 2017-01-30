@@ -15,6 +15,13 @@ export default function index() {
   camera.position.set(0, 10, -30);
   camera.lookAt(new THREE.Vector3(0, 0, 0))
 
+  const floorMirror = new THREE.Mirror(renderer, camera, {
+    textureWidth: 2048,
+    textureHeight: 2048,
+    color: 0xaaaaaa,
+  });
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
   var reflectionCube = new THREE.CubeTextureLoader().load([
     "./img/cubemap/posx.jpg",
     "./img/cubemap/negx.jpg",
@@ -24,27 +31,48 @@ export default function index() {
     "./img/cubemap/negz.jpg",
   ]);
 
-  var material = new THREE.MeshStandardMaterial({
+  var hairline = new THREE.TextureLoader().load("./img/hairline.png");
+  hairline.repeat.set(1, 2);
+  hairline.wrapS = hairline.wrapT = THREE.RepeatWrapping;
+
+  const materialParams = {
     envMap: reflectionCube,
     roughness: .6,
     metalness: .99,
     color: 0xffffff,
-  });
+    bumpMap: hairline,
+    bumpScale: -.002,
+  };
 
+  var material = new THREE.MeshStandardMaterial(Object.assign({}, materialParams))
 
   const points = [];
   const segments = 64
   for(let i=0; i<segments; i++) {
-    const theta = Math.PI * 2 * i / (segments - 1);
+    const theta = Math.PI * 2 * i / segments;
     points.push(new THREE.Vector2(
       theta < Math.PI ? Math.sin(theta) * .3 - 6 : Math.sin(theta) * .5 - 6,
       Math.cos(theta) * 1,
     ));
   }
-  // const geometry = new THREE.TorusGeometry(7, 1.5, 32, 64);
+  points.push(points[0].clone());
   const geometry = new THREE.LatheBufferGeometry(points, 64);
+
   const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.z = Math.PI / 2;
+  mesh.rotation.y = - Math.PI / 6;
+  mesh.position.y = .15;
+
   scene.add(mesh);
+
+  const floorGeometry = new THREE.PlaneBufferGeometry(100, 100, 4);
+
+  const floor = new THREE.Mesh(floorGeometry, floorMirror.material);
+  floor.rotation.set(- Math.PI / 2, 0, 0);
+  floor.position.set(0, -6.3, 0);
+  floor.add(floorMirror);
+
+  scene.add(floor);
 
   const pointLight = new THREE.PointLight( 0xf0f0ff, .9);
   pointLight.position.set(-100, 300, -100);
@@ -56,9 +84,7 @@ export default function index() {
   scene.add(pointLight);
 
   function tick(time) {
-    mesh.rotation.y = time * .0001;
-    mesh.rotation.x = time * .0002;
-    mesh.rotation.z = time * .0003;
+    floorMirror.render();
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   }
