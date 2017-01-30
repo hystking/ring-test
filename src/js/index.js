@@ -26,8 +26,8 @@ export default function index() {
 
   var material = new THREE.MeshStandardMaterial({
     envMap: reflectionCube,
-    roughness: .7,
-    metalness: .98,
+    roughness: .6,
+    metalness: .99,
     color: 0xffffff,
   });
 
@@ -46,10 +46,10 @@ export default function index() {
   const mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
 
-  const pointLight = new THREE.PointLight( 0xffffee, .7);
-  pointLight.position.set(-10000, 30000, -10000);
+  const pointLight = new THREE.PointLight( 0xf0f0ff, .9);
+  pointLight.position.set(-100, 300, -100);
 
-  const directionalLight = new THREE.DirectionalLight( 0xffffff, .4);
+  const directionalLight = new THREE.DirectionalLight( 0xffffff, .3);
   directionalLight.position.set(0, -100, -100);
 
   scene.add(directionalLight);
