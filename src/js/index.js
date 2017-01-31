@@ -4,8 +4,8 @@ export default function index() {
   const width = view.offsetWidth;
   const height = view.offsetHeight;
 
-  view.setAttribute("width", width);
-  view.setAttribute("height", height);
+  view.setAttribute("width", width * 2);
+  view.setAttribute("height", height * 2);
 
   const renderer = new THREE.WebGLRenderer({
     canvas: view,
