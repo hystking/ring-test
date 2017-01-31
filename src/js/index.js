@@ -26,8 +26,6 @@ export default function index() {
   })
   const controls = new THREE.OrbitControls(cameraTarget, renderer.domElement);
   controls.enablePan = false
-  controls.autoRotate = true
-  controls.autoRotateSpeed = -1
   controls.maxDistance = 40
   controls.minDistance = 15
   controls.target.set(0, 0, 0)
@@ -49,22 +47,22 @@ export default function index() {
   ]);
 
   var hairline = new THREE.TextureLoader().load("./img/hairline.png");
-  hairline.repeat.set(8, 8);
+  hairline.repeat.set(8, 1);
   hairline.wrapS = hairline.wrapT = THREE.RepeatWrapping;
 
   const materialParams = {
     envMap: reflectionCube,
-    roughness: .6,
+    roughness: .7,
     metalness: .99,
     color: 0xffffff,
     bumpMap: hairline,
-    bumpScale: -.002,
+    bumpScale: -.001,
   };
 
   var material = new THREE.MeshStandardMaterial(Object.assign({}, materialParams))
 
   const points = [];
-  const segments = 64
+  const segments = 128
   for(let i=0; i<segments; i++) {
     const theta = Math.PI * 2 * i / segments;
     points.push(new THREE.Vector2(
@@ -73,7 +71,7 @@ export default function index() {
     ));
   }
   points.push(points[0].clone());
-  const geometry = new THREE.LatheBufferGeometry(points, 64);
+  const geometry = new THREE.LatheBufferGeometry(points, 128);
 
   const mesh = new THREE.Mesh(geometry, material);
   mesh.rotation.z = Math.PI / 2;
