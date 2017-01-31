@@ -1,3 +1,5 @@
+import Delayer from "./delayer"
+
 export default function index() {
   const width = view.offsetWidth;
   const height = view.offsetHeight;
@@ -12,15 +14,30 @@ export default function index() {
   renderer.setClearColor(0xffffff, 1);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, width / height, 1, 200);
-  camera.position.set(0, 10, -30);
-  camera.lookAt(new THREE.Vector3(0, 0, 0))
+  const cameraTarget = new THREE.PerspectiveCamera(60, width / height, 1, 200);
+  cameraTarget.position.set(0, 10, -30);
+  camera.position.copy(cameraTarget.position);
+  cameraTarget.lookAt(new THREE.Vector3(0, 0, 0));
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
+  const cameraDelayer = new Delayer({
+    object: camera,
+    target: cameraTarget,
+    delay: .9,
+  })
+  const controls = new THREE.OrbitControls(cameraTarget, renderer.domElement);
+  controls.enablePan = false
+  controls.autoRotate = true
+  controls.autoRotateSpeed = -1
+  controls.maxDistance = 40
+  controls.minDistance = 15
+  controls.target.set(0, 0, 0)
+  controls.maxPolarAngle = Math.PI * .45
 
   const floorMirror = new THREE.Mirror(renderer, camera, {
     textureWidth: 2048,
     textureHeight: 2048,
     color: 0xaaaaad,
   });
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   var reflectionCube = new THREE.CubeTextureLoader().load([
     "./img/cubemap/posx.jpg",
@@ -84,6 +101,8 @@ export default function index() {
   scene.add(pointLight);
 
   function tick(time) {
+    controls.update();
+    cameraDelayer.update();
     floorMirror.render();
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
