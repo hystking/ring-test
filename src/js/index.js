@@ -52,11 +52,11 @@ export default function index() {
 
   const materialParams = {
     envMap: reflectionCube,
-    roughness: .7,
+    roughness: .74,
     metalness: .99,
-    color: 0xffffff,
+    color: 0xf6fffc,
     bumpMap: hairline,
-    bumpScale: -.001,
+    bumpScale: -.0005,
   };
 
   var material = new THREE.MeshStandardMaterial(Object.assign({}, materialParams))
