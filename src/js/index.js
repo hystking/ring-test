@@ -47,7 +47,7 @@ export default function index() {
   ]);
 
   var hairline = new THREE.TextureLoader().load("./img/hairline.png");
-  hairline.repeat.set(8, 1);
+  hairline.repeat.set(8, 2);
   hairline.wrapS = hairline.wrapT = THREE.RepeatWrapping;
 
   const materialParams = {
@@ -56,7 +56,7 @@ export default function index() {
     metalness: .99,
     color: 0xf6fffc,
     bumpMap: hairline,
-    bumpScale: -.0005,
+    bumpScale: -.0007,
   };
 
   var material = new THREE.MeshStandardMaterial(Object.assign({}, materialParams))
