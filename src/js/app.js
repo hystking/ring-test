@@ -4,6 +4,7 @@ export default function routes(path) {
   switch(path) {
     case "/":
     case "/index.html":
+    default:
       return index()
   }
 }
