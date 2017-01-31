@@ -18,7 +18,7 @@ export default function index() {
   const floorMirror = new THREE.Mirror(renderer, camera, {
     textureWidth: 2048,
     textureHeight: 2048,
-    color: 0xaaaaaa,
+    color: 0xaaaaad,
   });
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -32,7 +32,7 @@ export default function index() {
   ]);
 
   var hairline = new THREE.TextureLoader().load("./img/hairline.png");
-  hairline.repeat.set(1, 2);
+  hairline.repeat.set(8, 8);
   hairline.wrapS = hairline.wrapT = THREE.RepeatWrapping;
 
   const materialParams = {
