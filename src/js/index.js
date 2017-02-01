@@ -31,12 +31,6 @@ export default function index() {
   controls.target.set(0, 0, 0)
   controls.maxPolarAngle = Math.PI * .45
 
-  const floorMirror = new THREE.Mirror(renderer, camera, {
-    textureWidth: 2048,
-    textureHeight: 2048,
-    color: 0xaaaaad,
-  });
-
   var reflectionCube = new THREE.CubeTextureLoader().load([
     "./img/cubemap/posx.jpg",
     "./img/cubemap/negx.jpg",
@@ -46,20 +40,34 @@ export default function index() {
     "./img/cubemap/negz.jpg",
   ]);
 
+  /*
+  const reflectionEquirec = new THREE.TextureLoader().load("./img/equirecmap.jpg");
+  reflectionEquirec.mapping = THREE.EquirectangularReflectionMapping;
+  reflectionEquirec.magFilter = THREE.LinearFilter;
+  reflectionEquirec.minFilter = THREE.LinearMipMapLinearFilter;
+  */
+
   var hairline = new THREE.TextureLoader().load("./img/hairline.png");
   hairline.repeat.set(8, 2);
   hairline.wrapS = hairline.wrapT = THREE.RepeatWrapping;
 
-  const materialParams = {
+  var cubemapMaterial = new THREE.MeshStandardMaterial({
     envMap: reflectionCube,
     roughness: .74,
     metalness: .99,
     color: 0xf6fffc,
     bumpMap: hairline,
     bumpScale: -.0007,
-  };
+  });
 
-  var material = new THREE.MeshStandardMaterial(Object.assign({}, materialParams))
+  var equirecmapMaterial = new THREE.MeshStandardMaterial({
+    // envMap: reflectionEquirec,
+    roughness: .4,
+    metalness: .9,
+    color: 0xf6fffc,
+    bumpMap: hairline,
+    bumpScale: -.001,
+  });
 
   const points = [];
   const segments = 128
@@ -73,30 +81,39 @@ export default function index() {
   points.push(points[0].clone());
   const geometry = new THREE.LatheBufferGeometry(points, 128);
 
-  const mesh = new THREE.Mesh(geometry, material);
+  const mesh = new THREE.Mesh(geometry, cubemapMaterial);
+  // const mesh = new THREE.Mesh(geometry, equirecmapMaterial);
   mesh.rotation.z = Math.PI / 2;
   mesh.rotation.y = - Math.PI / 6;
   mesh.position.y = .15;
 
   scene.add(mesh);
 
-  const floorGeometry = new THREE.PlaneBufferGeometry(100, 100, 4);
+  /* Floor */
 
+  const floorMirror = new THREE.Mirror(renderer, camera, {
+    textureWidth: 2048,
+    textureHeight: 2048,
+    color: 0xaaaaad,
+  });
+  const floorGeometry = new THREE.PlaneBufferGeometry(100, 100, 4);
   const floor = new THREE.Mesh(floorGeometry, floorMirror.material);
   floor.rotation.set(- Math.PI / 2, 0, 0);
   floor.position.set(0, -6.3, 0);
   floor.add(floorMirror);
-
   scene.add(floor);
 
+  /* Lights */
+
+  const ambientLight = new THREE.AmbientLight( 0xffffff, .3);
   const pointLight = new THREE.PointLight( 0xf0f0ff, .9);
   pointLight.position.set(-100, 300, -100);
-
   const directionalLight = new THREE.DirectionalLight( 0xffffff, .3);
   directionalLight.position.set(0, -100, -100);
 
-  scene.add(directionalLight);
+  scene.add(ambientLight);
   scene.add(pointLight);
+  scene.add(directionalLight);
 
   function tick(time) {
     controls.update();
