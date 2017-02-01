@@ -78,13 +78,20 @@ export default function index() {
   points.push(points[0].clone());
   const geometry = new THREE.LatheBufferGeometry(points, 256);
 
-  const mesh = new THREE.Mesh(geometry, cubemapMaterial);
-  // const mesh = new THREE.Mesh(geometry, equirecmapMaterial);
-  mesh.rotation.z = Math.PI / 2;
-  mesh.rotation.y = - Math.PI / 6;
-  mesh.position.y = .3;
+  const meshContainer = new THREE.Object3D();
+  scene.add(meshContainer);
+  meshContainer.rotation.z = Math.PI / 2;
+  meshContainer.rotation.y = - Math.PI / 6;
+  meshContainer.position.y = .3;
 
-  scene.add(mesh);
+  const mesh1 = new THREE.Mesh(geometry, cubemapMaterial);
+  const mesh2 = new THREE.Mesh(geometry, cubemapMaterial);
+  const mesh3 = new THREE.Mesh(geometry, cubemapMaterial);
+  mesh2.position.y = 5;
+  mesh3.position.y = -5;
+  meshContainer.add(mesh1);
+  meshContainer.add(mesh2);
+  meshContainer.add(mesh3);
 
   /* Floor */
 
