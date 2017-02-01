@@ -1,4 +1,5 @@
 import RendererStats from "./renderer-stats"
+import TimeSkipper from "./time-skipper"
 
 export default function index() {
   const width = view.offsetWidth;
@@ -113,11 +114,16 @@ export default function index() {
 
   function tick(time) {
     controls.update();
-    floorMirror.render();
-    renderer.render(scene, camera);
-    rendererStats.update(time);
+    timeSkipper.exec(time);
     requestAnimationFrame(tick);
   }
 
+  function update(time) {
+    floorMirror.render();
+    renderer.render(scene, camera);
+    rendererStats.update(time);
+  }
+
+  const timeSkipper = new TimeSkipper(update, 30);
   requestAnimationFrame(tick);
 }
