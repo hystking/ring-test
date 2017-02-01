@@ -1,4 +1,3 @@
-import Delayer from "./delayer"
 import RendererStats from "./renderer-stats"
 
 export default function index() {
@@ -15,19 +14,12 @@ export default function index() {
   renderer.setClearColor(0xffffff, 1);
   const rendererStats = new RendererStats(renderer);
   document.body.appendChild(rendererStats.dom);
+
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, width / height, 1, 200);
-  const cameraTarget = new THREE.PerspectiveCamera(60, width / height, 1, 200);
-  cameraTarget.position.set(0, 10, -30);
-  camera.position.copy(cameraTarget.position);
-  cameraTarget.lookAt(new THREE.Vector3(0, 0, 0));
+  camera.position.set(0, 10, -30);
   camera.lookAt(new THREE.Vector3(0, 0, 0));
-  const cameraDelayer = new Delayer({
-    object: camera,
-    target: cameraTarget,
-    delay: .9,
-  })
-  const controls = new THREE.OrbitControls(cameraTarget, renderer.domElement);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enablePan = false
   controls.maxDistance = 40
   controls.minDistance = 15
@@ -120,7 +112,6 @@ export default function index() {
 
   function tick(time) {
     controls.update();
-    cameraDelayer.update();
     floorMirror.render();
     renderer.render(scene, camera);
     rendererStats.update(time);
