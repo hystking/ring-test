@@ -1,4 +1,5 @@
 import Delayer from "./delayer"
+import RendererStats from "./renderer-stats"
 
 export default function index() {
   const width = view.offsetWidth;
@@ -12,6 +13,8 @@ export default function index() {
     antialias: true,
   });
   renderer.setClearColor(0xffffff, 1);
+  const rendererStats = new RendererStats(renderer);
+  document.body.appendChild(rendererStats.dom);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, width / height, 1, 200);
   const cameraTarget = new THREE.PerspectiveCamera(60, width / height, 1, 200);
@@ -120,6 +123,7 @@ export default function index() {
     cameraDelayer.update();
     floorMirror.render();
     renderer.render(scene, camera);
+    rendererStats.update(time);
     requestAnimationFrame(tick);
   }
 
