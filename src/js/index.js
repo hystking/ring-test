@@ -68,8 +68,9 @@ export default function index() {
   const segments = 255
   for(let i=0; i<segments; i++) {
     const theta = Math.PI * 2 * i / segments;
+    const wave = Math.sin(theta * 8) * .1;
     points.push(new THREE.Vector2(
-      theta < Math.PI ? Math.sin(theta) * .3 - 6 : Math.sin(theta) * .5 - 6,
+      Math.sin(theta) * (2 - Math.sin(theta)) * .2 - 6,
       Math.cos(theta) * 1,
     ));
   }
@@ -80,7 +81,7 @@ export default function index() {
   // const mesh = new THREE.Mesh(geometry, equirecmapMaterial);
   mesh.rotation.z = Math.PI / 2;
   mesh.rotation.y = - Math.PI / 6;
-  mesh.position.y = .15;
+  mesh.position.y = .3;
 
   scene.add(mesh);
 
