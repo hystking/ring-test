@@ -73,7 +73,7 @@ export default function index() {
   });
 
   const points = [];
-  const segments = 128
+  const segments = 255
   for(let i=0; i<segments; i++) {
     const theta = Math.PI * 2 * i / segments;
     points.push(new THREE.Vector2(
@@ -82,7 +82,7 @@ export default function index() {
     ));
   }
   points.push(points[0].clone());
-  const geometry = new THREE.LatheBufferGeometry(points, 128);
+  const geometry = new THREE.LatheBufferGeometry(points, 256);
 
   const mesh = new THREE.Mesh(geometry, cubemapMaterial);
   // const mesh = new THREE.Mesh(geometry, equirecmapMaterial);
