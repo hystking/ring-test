@@ -60,7 +60,7 @@ export default function index() {
     metalness: .99,
     color: 0xf6fffc,
     bumpMap: hairline,
-    bumpScale: -.0007,
+    bumpScale: -.001,
   });
 
   var equirecmapMaterial = new THREE.MeshStandardMaterial({
