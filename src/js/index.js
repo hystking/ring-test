@@ -1,6 +1,14 @@
 import RendererStats from "./renderer-stats"
 import TimeSkipper from "./time-skipper"
 
+function pingPong(t) {
+  t = t % (Math.PI * 2)
+  if(t < Math.PI) {
+    return t / Math.PI
+  }
+  return 1 - (t - Math.PI) / Math.PI
+}
+
 export default function index() {
   const width = view.offsetWidth;
   const height = view.offsetHeight;
@@ -69,9 +77,9 @@ export default function index() {
   const segments = 255
   for(let i=0; i<segments; i++) {
     const theta = Math.PI * 2 * i / segments;
-    const wave = Math.sin(theta * 8) * .1;
+    const wave = theta < Math.PI ? 1 : Math.pow(pingPong((theta - Math.PI) * 4), 2) * .4 + 1
     points.push(new THREE.Vector2(
-      Math.sin(theta) * (2 - Math.sin(theta)) * .2 - 6,
+      Math.sin(theta) * (2 - Math.sin(theta)) * wave * .2 - 6,
       Math.cos(theta) * 1,
     ));
   }
