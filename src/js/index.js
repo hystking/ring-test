@@ -29,14 +29,14 @@ function pingPong(t) {
   return 1 - (t - Math.PI) / Math.PI
 }
 
-function generateRingGeometry(radius) {
+function generateRingGeometry(radius, width) {
   const points = [];
   const segments = 127
   for(let i=0; i<segments; i++) {
     const theta = Math.PI * 2 * i / segments;
     const wave = theta < Math.PI ? 1 : Math.pow(pingPong((theta - Math.PI) * 4), 2) * .4 + 1
     let x = Math.sin(theta) * (2 - Math.sin(theta)) * wave * .2;
-    let y = Math.cos(theta) * 1;
+    let y = Math.cos(theta) * width;
     if(x < -.555) {
       x = (x + -.555 * 7) / 8
     }
@@ -50,7 +50,7 @@ function generateRingGeometry(radius) {
   return new THREE.LatheBufferGeometry(points, 128);
 }
 
-function generateRingMesh(radius) {
+function generateRingMesh(radius, width) {
   var material = new THREE.MeshStandardMaterial({
     envMap: reflectionTexture,
     roughness: .74,
@@ -71,7 +71,7 @@ function generateRingMesh(radius) {
   });
   */
 
-  const geometry = generateRingGeometry(radius);
+  const geometry = generateRingGeometry(radius, width);
   const mesh = new THREE.Mesh(geometry, material);
   mesh.rotation.z = Math.PI / 2;
   mesh.rotation.y = - Math.PI / 6;
@@ -105,8 +105,7 @@ export default function index() {
   controls.target.set(0, 0, 0)
   controls.maxPolarAngle = Math.PI * .45
 
-  const mesh = generateRingMesh(5)
-  scene.add(mesh);
+  let currentMesh = null
 
   /* Floor */
 
@@ -119,7 +118,6 @@ export default function index() {
   const floorGeometry = new THREE.PlaneBufferGeometry(100, 100, 4);
   const floor = new THREE.Mesh(floorGeometry, floorMirror.material);
   floor.rotation.set(- Math.PI / 2, 0, 0);
-  floor.position.set(0, -5 -.555, 0);
   floor.add(floorMirror);
   scene.add(floor);
 
@@ -134,6 +132,27 @@ export default function index() {
   scene.add(ambientLight);
   scene.add(pointLight);
   scene.add(directionalLight);
+
+  function changeRing(radius, width) {
+    if(currentMesh) {
+      currentMesh.geometry.dispose();
+      scene.remove(currentMesh);
+    }
+    currentMesh = generateRingMesh(radius, width);
+    scene.add(currentMesh);
+    floor.position.set(0, -radius - .555, 0);
+  }
+
+  function updateRing() {
+    const radius = 4.5 + (radiusSlider.value / 100);
+    const width = .5 + (widthSlider.value / 100);
+    changeRing(radius, width);
+  }
+
+  radiusSlider.addEventListener("change", updateRing)
+  widthSlider.addEventListener("change", updateRing)
+
+  updateRing();
 
   function tick(time) {
     controls.update();
