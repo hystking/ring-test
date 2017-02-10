@@ -1,6 +1,8 @@
 import RendererStats from "./renderer-stats"
 import TimeSkipper from "./time-skipper"
+import _ from "lodash"
 
+/*
 var reflectionTexture = new THREE.CubeTextureLoader().load([
   "./img/cubemap/posx.jpg",
   "./img/cubemap/negx.jpg",
@@ -9,13 +11,12 @@ var reflectionTexture = new THREE.CubeTextureLoader().load([
   "./img/cubemap/posz.jpg",
   "./img/cubemap/negz.jpg",
 ]);
+*/
 
-/*
 const reflectionTexture = new THREE.TextureLoader().load("./img/equirecmap.jpg");
 reflectionTexture.mapping = THREE.EquirectangularReflectionMapping;
 reflectionTexture.magFilter = THREE.LinearFilter;
 reflectionTexture.minFilter = THREE.LinearMipMapLinearFilter;
-*/
 
 var hairline = new THREE.TextureLoader().load("./img/hairline.png");
 hairline.repeat.set(8, 2);
@@ -34,12 +35,14 @@ function generateRingGeometry(radius, width) {
   const segments = 127
   for(let i=0; i<segments; i++) {
     const theta = Math.PI * 2 * i / segments;
-    const wave = theta < Math.PI ? 1 : Math.pow(pingPong((theta - Math.PI) * 4), 2) * .4 + 1
+    const wave = theta < Math.PI ? 1 : Math.pow(pingPong((theta - Math.PI) * 4), 2) * .2 + 1
     let x = Math.sin(theta) * (2 - Math.sin(theta)) * wave * .2;
     let y = Math.cos(theta) * width;
+    /*
     if(x < -.555) {
       x = (x + -.555 * 7) / 8
     }
+   */
     if(x > .15) {
       x = (x + .15 * 7) / 8
     }
@@ -50,26 +53,30 @@ function generateRingGeometry(radius, width) {
   return new THREE.LatheBufferGeometry(points, 128);
 }
 
-function generateRingMesh(radius, width) {
+function generateRingMesh(radius, width, material_name) {
+  /*
   var material = new THREE.MeshStandardMaterial({
     envMap: reflectionTexture,
     roughness: .74,
     metalness: .99,
     color: 0xf6fffc,
     bumpMap: hairline,
-    bumpScale: -.001,
+    bumpScale: -.0007,
   });
+  */
 
-  /*
   var material = new THREE.MeshStandardMaterial({
     envMap: reflectionTexture,
     roughness: .4,
-    metalness: .9,
-    color: 0xf6fffc,
+    metalness: .95,
+    color:
+        material_name == "platinum" ? 0xffffff
+      : material_name == "gold" ? 0xffd280 
+      : material_name == "red_gold" ? 0xffccaa
+      : 0xfefffc,
     bumpMap: hairline,
-    bumpScale: -.001,
+    bumpScale: -.0002,
   });
-  */
 
   const geometry = generateRingGeometry(radius, width);
   const mesh = new THREE.Mesh(geometry, material);
@@ -105,7 +112,6 @@ export default function index() {
   controls.target.set(0, 0, 0)
   controls.maxPolarAngle = Math.PI * .45
 
-  let currentMesh = null
 
   /* Floor */
 
@@ -123,22 +129,23 @@ export default function index() {
 
   /* Lights */
 
-  const ambientLight = new THREE.AmbientLight( 0xffffff, .3);
-  const pointLight = new THREE.PointLight( 0xf0f0ff, .9);
+  const pointLight = new THREE.PointLight( 0xf0f0ff, .4);
   pointLight.position.set(-100, 300, -100);
-  const directionalLight = new THREE.DirectionalLight( 0xffffff, .3);
+
+  const directionalLight = new THREE.DirectionalLight( 0xffffff, .5);
   directionalLight.position.set(0, -100, -100);
 
-  scene.add(ambientLight);
   scene.add(pointLight);
   scene.add(directionalLight);
 
-  function changeRing(radius, width) {
+  let currentMesh = null
+
+  function changeRing(radius, width, material_name) {
     if(currentMesh) {
       currentMesh.geometry.dispose();
       scene.remove(currentMesh);
     }
-    currentMesh = generateRingMesh(radius, width);
+    currentMesh = generateRingMesh(radius, width, material_name);
     scene.add(currentMesh);
     floor.position.set(0, -radius - .555, 0);
   }
@@ -146,13 +153,9 @@ export default function index() {
   function updateRing() {
     const radius = 4.5 + (radiusSlider.value / 100);
     const width = .5 + (widthSlider.value / 100);
-    changeRing(radius, width);
+    const material_name = _.find(document.getElementsByName("material"), dom => dom.checked).value
+    changeRing(radius, width, material_name);
   }
-
-  radiusSlider.addEventListener("change", updateRing)
-  widthSlider.addEventListener("change", updateRing)
-
-  updateRing();
 
   function tick(time) {
     controls.update();
@@ -166,6 +169,11 @@ export default function index() {
     rendererStats.update(time);
   }
 
-  const timeSkipper = new TimeSkipper(update, 30);
+  const timeSkipper = new TimeSkipper(update, 60);
+
+  radiusSlider.addEventListener("change", updateRing)
+  widthSlider.addEventListener("change", updateRing)
+  _.forEach(document.getElementsByName("material"), dom => dom.addEventListener("change", updateRing))
   requestAnimationFrame(tick);
+  updateRing();
 }
