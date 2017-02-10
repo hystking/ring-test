@@ -69,16 +69,16 @@ function generateEmbossTexture(text) {
   generateNormal(bokashiCtx, normalCtx);
   generateBokashi(normalCtx, normalCtx);
 
-  const embosNormalTexture = new THREE.Texture(normalCtx.canvas);
-  embosNormalTexture.repeat.set(5, 1);
-  // embosNormalTexture.wrapS = embosNormalTexture.wrapT = THREE.RepeatWrapping;
-  embosNormalTexture.needsUpdate = true;
+  const embossNormalTexture = new THREE.Texture(normalCtx.canvas);
+  embossNormalTexture.repeat.set(5, 1);
+  // embossNormalTexture.wrapS = embossNormalTexture.wrapT = THREE.RepeatWrapping;
+  embossNormalTexture.needsUpdate = true;
 
-  return embosNormalTexture;
+  return embossNormalTexture;
 }
 
 function generateRingMaterial(material_name, text) {
-  const embosNormalTexture = generateEmbossTexture(text);
+  const embossNormalTexture = generateEmbossTexture(text);
   const material = new THREE.MeshStandardMaterial({
     envMap: reflectionTexture,
     roughness: .4,
@@ -88,10 +88,10 @@ function generateRingMaterial(material_name, text) {
       : material_name == "gold" ? 0xffd280 
       : material_name == "red_gold" ? 0xffccaa
       : 0xfefffc,
-    // map: embosNormalTexture,
+    // map: embossNormalTexture,
     bumpMap: hairline,
     bumpScale: -.0004,
-    normalMap: embosNormalTexture,
+    normalMap: embossNormalTexture,
     normalScale: new THREE.Vector2(-1, -1),
   });
   return material
