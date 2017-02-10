@@ -24,15 +24,18 @@ block content
   canvas#view.view
   .ui
     .ui__element
-      label 半径
+      label(for="radiusSlider") 半径
       input#radiusSlider(type="range")
     .ui__element
-      label 幅
+      label(for="widthSlider") 幅
       input#widthSlider(type="range")
     .ui__element
-      label Platinum
-      input(type="radio" name="material" value="platinum" checked)
-      label Gold
-      input(type="radio" name="material" value="gold")
-      label Red Gold
-      input(type="radio" name="material" value="red_gold")
+      label(for="platinumRadio") Platinum
+      input#platinumRadio(type="radio" name="material" value="platinum" checked)
+      label(for="goldRadio") Gold
+      input#goldRadio(type="radio" name="material" value="gold")
+      label(for="redGoldRadio") Red Gold
+      input#redGoldRadio(type="radio" name="material" value="red_gold")
+    .ui__element
+      label(for="embossText") 刻印
+      input#embossText(type="text" value="Emboss")
