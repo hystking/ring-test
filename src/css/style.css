@@ -102,7 +102,12 @@ body {
 .ui__range::-webkit-slider-thumb {
   -webkit-appearance: none;
   display: block;
-  width: 8px;
+  width: 10px;
   height: 16px;
   background: #665;
+}
+
+.ui__inner {
+  max-width: 320px;
+  margin: 0 auto;
 }
