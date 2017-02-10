@@ -8,7 +8,7 @@ body {
 }
   
 html, body {
-  position: relative;
+  position: flex;
   width: 100%;
   height: 100%;
 }
@@ -89,7 +89,9 @@ body {
   height: 12px;
   appearance: none;
   background: #eed;
+  border-radius: 0;
 }
+
 .ui__range:focus {
   outline: none;
 }
@@ -98,7 +100,9 @@ body {
 }
 
 .ui__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  display: block;
+  width: 8px;
   height: 16px;
-  width: 16px;
-  opacity: 0;
+  background: #665;
 }
