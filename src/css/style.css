@@ -105,6 +105,7 @@ body {
   width: 10px;
   height: 16px;
   background: #665;
+  border: none;
 }
 
 .ui__inner {
