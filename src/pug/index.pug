@@ -21,21 +21,23 @@ block append meta
   meta(name="twitter:image:src", content=meta.ogImage)
 
 block content
-  canvas#view.view
+  .view-wrapper: canvas#view.view
   .ui
     .ui__element
-      label(for="radiusSlider") 半径
-      input#radiusSlider(type="range")
+      label.ui__label(for="radiusSlider") Size
+      input.ui__range#radiusSlider(type="range")
     .ui__element
-      label(for="widthSlider") 幅
-      input#widthSlider(type="range")
+      label.ui__label(for="widthSlider") Width
+      input.ui__range#widthSlider(type="range")
     .ui__element
-      label(for="platinumRadio") Platinum
-      input#platinumRadio(type="radio" name="material" value="platinum" checked)
-      label(for="goldRadio") Gold
-      input#goldRadio(type="radio" name="material" value="gold")
-      label(for="redGoldRadio") Red Gold
-      input#redGoldRadio(type="radio" name="material" value="red_gold")
+      label.ui__label Material
+      .ui__radios
+        input.ui__radio#platinumRadio(type="radio" name="material" value="platinum" checked)
+        label.ui__radio-label(for="platinumRadio") Platinum
+        input.ui__radio#goldRadio(type="radio" name="material" value="gold")
+        label.ui__radio-label(for="goldRadio") Gold
+        input.ui__radio#redGoldRadio(type="radio" name="material" value="red_gold")
+        label.ui__radio-label(for="redGoldRadio") Red Gold
     .ui__element
-      label(for="embossText") 刻印
-      input#embossText(type="text" value="Emboss")
+      label.ui__label(for="embossText") Emboss
+      input.ui__emboss#embossText(type="text" value="Emboss")

@@ -35,8 +35,8 @@ function pingPong(t) {
 
 function generateRingGeometry(radius, width) {
   const points = [];
-  const segmentX = 100 - 1
-  const segmentY = 100
+  const segmentX = 128 - 1
+  const segmentY = 128
   for(let i=0; i<segmentX; i++) {
     const theta = Math.PI * 2 * i / segmentX;
     const wave = theta < Math.PI ? 1 : Math.pow(pingPong((theta - Math.PI) * 4), 2) * .2 + 1
@@ -52,35 +52,36 @@ function generateRingGeometry(radius, width) {
   return new THREE.LatheBufferGeometry(points, segmentY);
 }
 
-function generateEmbossTexture(text) {
+function generateEmbossTexture(radius, width, text) {
   const canvasSize = 1024;
   const ctx = createCtx(canvasSize, canvasSize);
   const bokashiCtx = createCtx(canvasSize, canvasSize);
   const normalCtx = createCtx(canvasSize, canvasSize);
 
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvasSize, canvasSize);
   ctx.translate(canvasSize / 2, canvasSize * 3 / 4);
   ctx.scale(-1, -1);
   ctx.font = `${canvasSize / 8}px Serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = "#000";
   ctx.fillText(text, 0, 0);
 
   generateBokashi(ctx, bokashiCtx);
-  generateNormal(bokashiCtx, normalCtx);
-  generateBokashi(normalCtx, normalCtx);
+  // generateNormal(bokashiCtx, normalCtx);
+  // generateBokashi(normalCtx, normalCtx);
 
-  const embossNormalTexture = new THREE.Texture(normalCtx.canvas);
-  embossNormalTexture.repeat.set(5, 1);
-  embossNormalTexture.offset.set(.5, 0);
-  embossNormalTexture.wrapS = embossNormalTexture.wrapT = THREE.RepeatWrapping;
+  const ratio = 5 * (radius / width) / (5 / 1);
+  const embossNormalTexture = new THREE.Texture(bokashiCtx.canvas);
+  embossNormalTexture.repeat.set(ratio, 1);
+  embossNormalTexture.offset.set(0, 0);
   embossNormalTexture.needsUpdate = true;
 
   return embossNormalTexture;
 }
 
-function generateRingMaterial(material_name, text) {
-  const embossNormalTexture = generateEmbossTexture(text);
+function generateRingMaterial(material_name, embossNormalTexture) {
   const material = new THREE.MeshStandardMaterial({
     envMap: reflectionTexture,
     roughness: .4,
@@ -91,17 +92,19 @@ function generateRingMaterial(material_name, text) {
       : material_name == "red_gold" ? 0xffccaa
       : 0xfefffc,
     // map: embossNormalTexture,
-    bumpMap: hairline,
-    bumpScale: -.0004,
-    normalMap: embossNormalTexture,
-    normalScale: new THREE.Vector2(-1, -1),
+    // bumpMap: hairline,
+    // bumpScale: -.0004,
+    bumpMap: embossNormalTexture,
+    bumpScale: -.02,
+    // normalScale: new THREE.Vector2(-1, -1),
   });
   return material
 }
 
 function generateRingMesh(radius, width, material_name, text) {
+  const embossNormalTexture = generateEmbossTexture(radius, width, text);
   const geometry = generateRingGeometry(radius, width);
-  const material = generateRingMaterial(material_name, text);
+  const material = generateRingMaterial(material_name, embossNormalTexture);
   const mesh = new THREE.Mesh(geometry, material);
   mesh.rotation.z = Math.PI / 2;
   mesh.rotation.y = - Math.PI / 6;
@@ -250,11 +253,12 @@ export default function index() {
   });
   renderer.setClearColor(0xffffff, 1);
   const rendererStats = new RendererStats(renderer);
-  document.body.appendChild(rendererStats.dom);
+  // document.body.appendChild(rendererStats.dom);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, width / height, 1, 200);
   camera.position.set(0, 10, 30);
+  camera.position.normalize().multiplyScalar(30)
   camera.lookAt(new THREE.Vector3(0, 0, 0));
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enablePan = false
@@ -295,7 +299,7 @@ export default function index() {
     if(currentMesh) {
       currentMesh.geometry.dispose();
       currentMesh.material.dispose();
-      currentMesh.material.normalMap.dispose();
+      currentMesh.material.bumpMap.dispose();
       scene.remove(currentMesh);
     }
     currentMesh = generateRingMesh(radius, width, material_name, text);
@@ -308,7 +312,11 @@ export default function index() {
     const width = .5 + (widthSlider.value / 100);
     const material_name = _.find(document.getElementsByName("material"), dom => dom.checked).value
     const text = embossText.value;
-    changeRing(radius, width, material_name, text);
+    view.setAttribute("data-loading", "1");
+    requestAnimationFrame(() => {
+      changeRing(radius, width, material_name, text);
+      view.setAttribute("data-loading", "0");
+    })
   }
 
   function tick(time) {
@@ -323,12 +331,21 @@ export default function index() {
     rendererStats.update(time);
   }
 
+  function updateSlider(dom) {
+    const value = dom.value
+    dom.style.background = "-webkit-linear-gradient(left, #ccb " + value + "%, #f4f4e8 " + value + "%)";
+  }
+
   const timeSkipper = new TimeSkipper(update, 60);
 
   radiusSlider.addEventListener("change", updateRing)
   widthSlider.addEventListener("change", updateRing)
+  radiusSlider.addEventListener("input", e => updateSlider(radiusSlider))
+  widthSlider.addEventListener("input", e => updateSlider(widthSlider))
   _.forEach(document.getElementsByName("material"), dom => dom.addEventListener("change", updateRing))
   embossText.addEventListener("change", updateRing)
   requestAnimationFrame(tick);
   updateRing();
+  updateSlider(radiusSlider);
+  updateSlider(widthSlider);
 }
