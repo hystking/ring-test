@@ -35,9 +35,10 @@ function pingPong(t) {
 
 function generateRingGeometry(radius, width) {
   const points = [];
-  const segments = 127
-  for(let i=0; i<segments; i++) {
-    const theta = Math.PI * 2 * i / segments;
+  const segmentX = 100 - 1
+  const segmentY = 100
+  for(let i=0; i<segmentX; i++) {
+    const theta = Math.PI * 2 * i / segmentX;
     const wave = theta < Math.PI ? 1 : Math.pow(pingPong((theta - Math.PI) * 4), 2) * .2 + 1
     let x = Math.sin(theta) * (2 - Math.sin(theta)) * wave * .2;
     let y = Math.cos(theta) * width;
@@ -48,7 +49,7 @@ function generateRingGeometry(radius, width) {
     points.push(new THREE.Vector2(x, y));
   }
   points.push(points[0].clone());
-  return new THREE.LatheBufferGeometry(points, 128);
+  return new THREE.LatheBufferGeometry(points, segmentY);
 }
 
 function generateEmbossTexture(text) {
@@ -71,7 +72,8 @@ function generateEmbossTexture(text) {
 
   const embossNormalTexture = new THREE.Texture(normalCtx.canvas);
   embossNormalTexture.repeat.set(5, 1);
-  // embossNormalTexture.wrapS = embossNormalTexture.wrapT = THREE.RepeatWrapping;
+  embossNormalTexture.offset.set(.5, 0);
+  embossNormalTexture.wrapS = embossNormalTexture.wrapT = THREE.RepeatWrapping;
   embossNormalTexture.needsUpdate = true;
 
   return embossNormalTexture;
